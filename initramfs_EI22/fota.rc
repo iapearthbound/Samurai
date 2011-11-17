@@ -2,7 +2,7 @@ on early-init
     start ueventd
 
 on init
-    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/data/local/tmp
+    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
     export LD_LIBRARY_PATH /vendor/lib:/system/lib:/system/lib/egl
     export ANDROID_ROOT /system
     export ANDROID_DATA /data
@@ -53,11 +53,8 @@ on early-fs
 
 on fs
 #    mount tmpfs tmpfs /tmp
-# /system
-    mount rfs /dev/block/stl9 /system rw check=no
-    #mount rfs /dev/block/stl9 /system rw noatime nodiratime check=no
-    mount ext4 /dev/block/stl9 /system rw noatime nodiratime nodelalloc check=none errors=continue data=writeback nobh nobarrier noauto_da_alloc discard
-
+    mount rfs /dev/block/stl9 /system check=no
+	mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue
 
 # SEC_DMCRYPT for MC_CRYPT_ROOT before apply_disk_policy or apply_sec_devenc_init
     #chown system system /efs
@@ -69,7 +66,7 @@ on fs
     exec apply_disk_policy
 
 on post-fs
-    mount rootfs rootfs / ro remount
+    #mount rootfs rootfs / ro remount
 
     write /proc/sys/kernel/panic_on_oops 1
     write /proc/sys/kernel/hung_task_timeout_secs 0
@@ -85,9 +82,6 @@ on boot
     hostname localhost
     domainname localdomain
 
-    write /sys/devices/platform/s3c-keypad/column_delay 5
-    write /sys/devices/platform/s3c-keypad/timer_delay  5
-
     class_start default
 
 service ueventd /sbin/ueventd
@@ -96,15 +90,11 @@ service ueventd /sbin/ueventd
 #service console /system/bin/sh
 #    console
 
-#service recovery /sbin/recovery
+service recovery /sbin/recovery
 #service recovery /system/bin/recovery
-#service recovery /sbin/recovery
-service init_scripts /samurai/scripts/run_init_scripts.sh recovery
-    user root
-    oneshot
 
 service adbd /sbin/adbd recovery
-    disabled
+#    disabled
 
 #on property:persist.service.adb.enable=1
 #    start adbd

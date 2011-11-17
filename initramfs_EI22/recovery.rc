@@ -2,7 +2,7 @@ on early-init
     start ueventd
 
 on init
-    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/data/local/tmp
+    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
     export LD_LIBRARY_PATH /vendor/lib:/system/lib:/system/lib/egl
     export ANDROID_ROOT /system
     export ANDROID_DATA /data
@@ -17,6 +17,7 @@ on init
     mkdir /data 0771 system system
     mkdir /cache
     #mkdir /efs
+    mkdir /tmp
     mkdir /dbdata
 
     mkdir /mnt 0775 root root
@@ -37,7 +38,8 @@ on early-fs
     insmod /lib/modules/fsr_stl.ko
     insmod /lib/modules/rfs_glue.ko
     insmod /lib/modules/rfs_fat.ko
-
+    #insmod /lib/modules/mbcache.ko
+    #insmod /lib/modules/ext4.ko
     # parameter block
     mkdir /mnt/.lfs 0755 root root
     insmod /lib/modules/j4fs.ko
@@ -52,19 +54,9 @@ on early-fs
 
 on fs
 #    mount tmpfs tmpfs /tmp
-# /system
-    mount rfs /dev/block/stl9 /system rw check=no
-    #mount rfs /dev/block/stl9 /system rw noatime nodiratime check=no
-    mount ext4 /dev/block/stl9 /system rw noatime nodiratime nodelalloc check=none errors=continue data=writeback nobh nobarrier noauto_da_alloc discard
-# /data
-    mount rfs /dev/block/stl10 /data rw nosuid nodev crypt check=no
-    #mount rfs /dev/block/stl10 /data rw noatime nodiratime nosuid nodev crypt check=no
-    #mount ext4 /dev/block/stl10 /data rw noatime nodiratime nodelalloc nosuid nodev crypt check=none errors=continue data=ordered nobh nobarrier noauto_da_alloc discard
-    mount ext4 /dev/block/stl10 /data rw noatime nodiratime nodelalloc nosuid nodev crypt data=ordered nobarrier noauto_da_alloc
-# /cache
-    mount rfs /dev/block/stl11 /cache rw nosuid nodev check=no
-    #mount rfs /dev/block/stl11 /cache rw noatime nodiratime nosuid nodev check=no
-    mount ext4 /dev/block/stl11 /cache rw noatime nodiratime nosuid nodev check=none errors=continue data=writeback nobh nobarrier noauto_da_alloc discard
+    mount rfs /dev/block/stl9 /system check=no
+	mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue
+
 
 # SEC_DMCRYPT for MC_CRYPT_ROOT before apply_disk_policy or apply_sec_devenc_init
     #chown system system /efs
@@ -76,7 +68,7 @@ on fs
     exec apply_disk_policy
 
 on post-fs
-    #mount rootfs rootfs / ro remount
+      #mount rootfs rootfs / ro remount
 
     write /proc/sys/kernel/panic_on_oops 1
     write /proc/sys/kernel/hung_task_timeout_secs 0
@@ -85,14 +77,29 @@ on post-fs
     write /proc/sys/kernel/sched_wakeup_granularity_ns 2000000
     write /proc/sys/kernel/sched_compat_yield 1
     write /proc/sys/kernel/sched_child_runs_first 0
+    chown root system /sbin
+    #chown root system /sbin/su
+    symlink /sbin/busybox /sbin/recovery
+    chown root system /sbin/busybox
+    chown root system /sbin/recovery
+    chown root system /sbin/sh
+    chown root system /sbin/adbd
+    #chown root system /sbin/recovery.sh
+    #chown root system /sbin/userscript.sh
+    chown root system /sbin
+
+    chmod 755 /sbin
+    #chmod 6755 /sbin/su
+    chmod 6755 /sbin/recovery
+    chmod 755 /sbin/adbd
+    #chmod 755 /sbin/recovery.sh
+    #chmod 755 /sbin/userscript.sh
 	
 on boot
+
     ifup lo
     hostname localhost
     domainname localdomain
-
-    write /sys/devices/platform/s3c-keypad/column_delay 5
-    write /sys/devices/platform/s3c-keypad/timer_delay  5
 
     class_start default
 
@@ -102,14 +109,17 @@ service ueventd /sbin/ueventd
 #service console /system/bin/sh
 #    console
 
-#service recovery /sbin/recovery
+service recovery /sbin/recovery
 #service recovery /system/bin/recovery
-service init_scripts /samurai/scripts/run_init_scripts.sh recovery
-    user root
-    oneshot
-
+#chmod 755 /sbin/recovery.sh
+#service sdx /sbin/recovery.sh   
+#critical
+#user root 
+#oneshot
 service adbd /sbin/adbd recovery
-    disabled
+#    disabled
+#service adbd /sbin/adbd recovery
+#    disabled
 
 #on property:persist.service.adb.enable=1
 #    start adbd

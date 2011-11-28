@@ -1,0 +1,39 @@
+#!/system/bin/sh
+# Epic Root Uninstaller by DRockstar
+# Modified for Clean Kernel script
+# assumes alternate busybox install in path
+#
+# modified by nubecoder
+
+PATH=/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/data/local/tmp
+
+toolbox mount -o remount,rw /system /system
+toolbox mount -o remount,rw / /
+
+/vendor/bin/bb_remove
+
+# List by DRockstar, I have seen all files referenced in various scripts
+# Ordered by folder and filename
+toolbox rm /data/dalvik-cache/system@app@Superuser.apk@classes.dex > /dev/null 2>&1
+toolbox rm /data/local/root.sh > /dev/null 2>&1
+toolbox rm /data/local/tmp/rageagainstthecage-arm5.bin > /dev/null 2>&1
+toolbox rm /etc/group > /dev/null 2>&1
+toolbox rm /etc/passwd > /dev/null 2>&1
+toolbox rm /etc/resolv.conf > /dev/null 2>&1
+toolbox rm /system/app/Superuser.apk > /dev/null 2>&1
+toolbox rm /system/bin/jk-su > /dev/null 2>&1
+toolbox rm /system/bin/joeykrim-root.sh > /dev/null 2>&1
+toolbox rm /system/bin/playlogo-orig > /dev/null 2>&1
+toolbox rm /system/bin/remount > /dev/null 2>&1
+toolbox rm /system/bin/resolv.conf > /dev/null 2>&1
+toolbox rm /system/bin/su > /dev/null 2>&1
+toolbox rm /system/etc/resolv.conf > /dev/null 2>&1
+toolbox rm /system/xbin/remount > /dev/null 2>$1
+toolbox rm /system/xbin/su > /dev/null 2>&1
+
+toolbox rm /system/xbin/keytimer > /dev/null 2>&1
+toolbox rm /data/local/keytimer > /dev/null 2>&1
+
+toolbox mount -o remount,ro /system /system
+toolbox mount -o remount,ro / /
+

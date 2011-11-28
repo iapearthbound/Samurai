@@ -1,0 +1,118 @@
+on early-init
+    start ueventd
+
+on init
+    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/data/local/tmp
+    export LD_LIBRARY_PATH /vendor/lib:/system/lib:/system/lib/egl
+    export ANDROID_ROOT /system
+    export ANDROID_DATA /data
+    export EXTERNAL_STORAGE /sdcard
+    export TMPDIR /data/local/tmp
+
+    symlink /system/etc /etc
+
+    mkdir /sdcard
+    mkdir /preload
+    mkdir /system
+    mkdir /data 0771 system system
+    mkdir /cache
+    #mkdir /efs
+    mkdir /dbdata
+
+    mkdir /mnt 0775 root root
+    mkdir /tmp
+
+    mkdir /data/fota 0771 system system    
+    mkdir /preinstall 0771 system system    
+
+    # This may have been created by the recovery system with odd permissions
+    chown system system /cache/recovery
+    chmod 0770 /cache/recovery
+
+on early-fs
+    mount tmpfs nodev /tmp
+
+    # rfs drivers
+    insmod /lib/modules/fsr.ko
+    insmod /lib/modules/fsr_stl.ko
+    insmod /lib/modules/rfs_glue.ko
+    insmod /lib/modules/rfs_fat.ko
+
+    # parameter block
+    mkdir /mnt/.lfs 0755 root root
+    insmod /lib/modules/j4fs.ko
+    mount j4fs /dev/block/stl6 /mnt/.lfs
+    insmod /lib/modules/dpram_recovery.ko
+    insmod /lib/modules/param.ko
+    insmod /lib/modules/drop_caches.ko
+
+    #temp
+    chown root root /sbin/fat.format
+    chmod 750 /sbin/fat.format
+
+on fs
+#    mount tmpfs tmpfs /tmp
+# /system
+    mount rfs /dev/block/stl9 /system rw check=no
+    #mount rfs /dev/block/stl9 /system rw noatime nodiratime check=no
+    mount ext4 /dev/block/stl9 /system rw noatime nodiratime nodelalloc check=none errors=continue data=writeback nobh nobarrier noauto_da_alloc discard
+# /data
+    mount rfs /dev/block/stl10 /data rw nosuid nodev crypt check=no
+    #mount rfs /dev/block/stl10 /data rw noatime nodiratime nosuid nodev crypt check=no
+    #mount ext4 /dev/block/stl10 /data rw noatime nodiratime nodelalloc nosuid nodev crypt check=none errors=continue data=ordered nobh nobarrier noauto_da_alloc discard
+    mount ext4 /dev/block/stl10 /data rw noatime nodiratime nodelalloc nosuid nodev crypt data=ordered nobarrier noauto_da_alloc
+# /cache
+    mount rfs /dev/block/stl11 /cache rw nosuid nodev check=no
+    #mount rfs /dev/block/stl11 /cache rw noatime nodiratime nosuid nodev check=no
+    mount ext4 /dev/block/stl11 /cache rw noatime nodiratime nosuid nodev check=none errors=continue data=writeback nobh nobarrier noauto_da_alloc discard
+
+# SEC_DMCRYPT for MC_CRYPT_ROOT before apply_disk_policy or apply_sec_devenc_init
+    #chown system system /efs
+    #chown radio radio /efs
+    #chown radio system /efs
+    #chmod 0771 /efs
+    #mount rfs /dev/block/stl3 /efs nosuid nodev check=no
+
+    exec apply_disk_policy
+
+on post-fs
+    #mount rootfs rootfs / ro remount
+
+    write /proc/sys/kernel/panic_on_oops 1
+    write /proc/sys/kernel/hung_task_timeout_secs 0
+    write /proc/cpu/alignment 4
+    write /proc/sys/kernel/sched_latency_ns 10000000
+    write /proc/sys/kernel/sched_wakeup_granularity_ns 2000000
+    write /proc/sys/kernel/sched_compat_yield 1
+    write /proc/sys/kernel/sched_child_runs_first 0
+	
+on boot
+    ifup lo
+    hostname localhost
+    domainname localdomain
+
+    write /sys/devices/platform/s3c-keypad/column_delay 5
+    write /sys/devices/platform/s3c-keypad/timer_delay  5
+
+    class_start default
+
+service ueventd /sbin/ueventd
+    critical
+
+#service console /system/bin/sh
+#    console
+
+#service recovery /sbin/recovery
+#service recovery /system/bin/recovery
+service init_scripts /samurai/scripts/run_init_scripts.sh recovery
+    user root
+    oneshot
+
+service adbd /sbin/adbd recovery
+    disabled
+
+#on property:persist.service.adb.enable=1
+#    start adbd
+
+#on property:persist.service.adb.enable=0
+#    stop adbd

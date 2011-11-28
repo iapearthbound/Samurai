@@ -1,0 +1,84 @@
+#!/system/bin/sh
+#
+# batt_info
+#
+#
+# 2011 nubecoder
+# http://www.nubecoder.com/
+#
+
+#defines
+FG_SYSFS_PATH="/sys/devices/virtual/sec/fg_atcom_test"
+BATT_SYSFS_PATH="/sys/class/power_supply/battery"
+
+#functions
+DISPLAY_FUEL_GAUGE_ENTRIES()
+{
+	local FILE_LIST="battery_fg_adjustment"
+	local FILE_LIST="$FILE_LIST set_fuel_gauage_read"
+	local FILE_LIST="$FILE_LIST set_fuel_gauage_reset"
+#	local FILE_LIST="$FILE_LIST dev"
+#	local FILE_LIST="$FILE_LIST uevent"
+	echo "FUEL GAUGE:"
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	for FILE in $FILE_LIST ; do
+		echo "	$FILE: $(cat $FG_SYSFS_PATH/$FILE)"
+	done
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	return 0
+}
+DISPLAY_BATTERY_ENTRIES()
+{
+	local FILE_LIST="type"
+	local FILE_LIST="$FILE_LIST technology"
+	local FILE_LIST="$FILE_LIST online"
+	local FILE_LIST="$FILE_LIST present"
+	local FILE_LIST="$FILE_LIST health"
+	local FILE_LIST="$FILE_LIST status"
+	local FILE_LIST="$FILE_LIST charging_source"
+	local FILE_LIST="$FILE_LIST charging_mode_booting"
+	local FILE_LIST="$FILE_LIST temp"
+	local FILE_LIST="$FILE_LIST batt_temp"
+	local FILE_LIST="$FILE_LIST batt_vol"
+	local FILE_LIST="$FILE_LIST voltage_now"
+	local FILE_LIST="$FILE_LIST batt_chg_current_aver"
+	local FILE_LIST="$FILE_LIST capacity"
+	local FILE_LIST="$FILE_LIST fg_soc"
+	local FILE_LIST="$FILE_LIST fg_point_level"
+	local FILE_LIST="$FILE_LIST batt_v_f_adc"
+	local FILE_LIST="$FILE_LIST charge_rate_ac"
+	local FILE_LIST="$FILE_LIST charge_rate_usb"
+	local FILE_LIST="$FILE_LIST charge_full_current"
+	local FILE_LIST="$FILE_LIST charge_full_voltage"
+	local FILE_LIST="$FILE_LIST charge_recharge_voltage"
+#	local FILE_LIST="$FILE_LIST auth_battery"
+#	local FILE_LIST="$FILE_LIST batt_full_check"
+#	local FILE_LIST="$FILE_LIST batt_temp_adc"
+#	local FILE_LIST="$FILE_LIST batt_temp_check"
+#	local FILE_LIST="$FILE_LIST batt_type"
+#	local FILE_LIST="$FILE_LIST batt_use"
+#	local FILE_LIST="$FILE_LIST batt_vol_adc"
+#	local FILE_LIST="$FILE_LIST browser"
+#	local FILE_LIST="$FILE_LIST call"
+#	local FILE_LIST="$FILE_LIST camera"
+#	local FILE_LIST="$FILE_LIST data_call"
+#	local FILE_LIST="$FILE_LIST hotspot"
+#	local FILE_LIST="$FILE_LIST music"
+#	local FILE_LIST="$FILE_LIST reset_soc"
+#	local FILE_LIST="$FILE_LIST slate_test_mode"
+#	local FILE_LIST="$FILE_LIST uevent"
+#	local FILE_LIST="$FILE_LIST video"
+#	local FILE_LIST="$FILE_LIST wimax"
+	echo "BATTERY:"
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	for FILE in $FILE_LIST ; do
+		echo "	$FILE: $(cat $BATT_SYSFS_PATH/$FILE)"
+	done
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	return 0
+}
+
+#main
+DISPLAY_FUEL_GAUGE_ENTRIES
+DISPLAY_BATTERY_ENTRIES
+

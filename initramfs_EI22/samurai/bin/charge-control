@@ -1,0 +1,120 @@
+#!/system/bin/sh
+#
+# charge_control
+#
+#
+# 2011 nubecoder
+# http://www.nubecoder.com/
+#
+
+#defines
+FG_SYSFS_PATH="/sys/devices/virtual/sec/fg_atcom_test"
+BATT_SYSFS_PATH="/sys/class/power_supply/battery"
+
+#functions
+SHOW_HELP()
+{
+	echo "Usage options for ${0##*/}:"
+	echo "fg       : battery_fg_adjustment value."
+	echo "			ex: ${0##*/} fg 9430"
+	echo "ac       : charge_rate_ac value."
+	echo "			ex: ${0##*/} ac 5"
+	echo "usb      : charge_rate_usb value."
+	echo "			ex: ${0##*/} usb 2"
+	echo "current  : charge_full_current value."
+	echo "			ex: ${0##*/} current 91"
+	echo "voltage  : charge_full_voltage."
+	echo "			ex: ${0##*/} voltage 4000"
+	echo "recharge : charge_recharge_voltage value."
+	echo "			ex: ${0##*/} recharge 4110"
+	echo "show     : show the current values."
+	echo ""
+	echo "Example of combined usage: ${0##*/} show fg 9430 recharge 4110 usb 2 show"
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	exit 0
+}
+DISPLAY_FUEL_GAUGE_ENTRIES()
+{
+	echo "FUEL GAUGE:"
+	local FILE_LIST="battery_fg_adjustment"
+	for FILE in $FILE_LIST ; do
+		echo "	$FILE: $(cat $FG_SYSFS_PATH/$FILE)"
+	done
+	return 0
+}
+DISPLAY_BATTERY_ENTRIES()
+{
+	echo "BATTERY:"
+	local FILE_LIST="charge_rate_ac"
+	local FILE_LIST="$FILE_LIST charge_rate_usb"
+	local FILE_LIST="$FILE_LIST charge_full_current"
+	local FILE_LIST="$FILE_LIST charge_full_voltage"
+	local FILE_LIST="$FILE_LIST charge_recharge_voltage"
+	for FILE in $FILE_LIST ; do
+		echo "	$FILE: $(cat $BATT_SYSFS_PATH/$FILE)"
+	done
+	return 0
+}
+HANDLE_ARGUMENT()
+{
+	local FILE=""
+	case "$1" in
+		fg)
+			local FILE="$FG_SYSFS_PATH/battery_fg_adjustment"
+		;;
+		ac)
+			local FILE="$BATT_SYSFS_PATH/charge_rate_ac"
+		;;
+		usb)
+			local FILE="$BATT_SYSFS_PATH/charge_rate_usb"
+		;;
+		current)
+			local FILE="$BATT_SYSFS_PATH/charge_full_current"
+		;;
+		voltage)
+			local FILE="$BATT_SYSFS_PATH/charge_full_voltage"
+		;;
+		recharge)
+			local FILE="$BATT_SYSFS_PATH/charge_recharge_voltage"
+		;;
+		show)
+			DISPLAY_FUEL_GAUGE_ENTRIES
+			DISPLAY_BATTERY_ENTRIES
+			return 1
+		;;
+		*)
+			echo "Unknown argument: $1"
+			SHOW_HELP
+		;;
+	esac
+	if [ "$FILE" != "" ] ; then
+		echo "echo $2 > $FILE"
+		echo "$2" > "$FILE"
+		if [ "$2" != $(cat "$FILE") ] ; then
+			echo "Invalid argument: $1 $2"
+		fi
+		return 2
+	fi
+}
+
+#main
+if [ -z $1 ]; then
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	SHOW_HELP
+else
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+	while [ "$1" ] ; do 
+		HANDLE_ARGUMENT "$1" "$2"
+		RET="$?"
+		if [ $RET = 2 ] ; then
+			shift 2
+		elif [ $RET = 1 ] ; then
+			shift 1
+		else
+			SHOW_HELP
+		fi
+	done
+	echo "=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]=]"
+fi
+exit 0
+

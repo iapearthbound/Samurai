@@ -1,0 +1,38 @@
+#!/system/bin/sh
+#
+# bb_install
+#
+#
+# 2011 nubecoder
+# http://www.nubecoder.com/
+#
+
+# functions
+CREATE_BUSYBOX_SYMLINK()
+{
+	echo "Creating /sbin/busybox symlink"
+	toolbox ln -s /sbin/recovery /sbin/busybox
+}
+INSTALL_BUSYBOX()
+{
+	echo "Installing busybox to /system/xbin/"
+	/sbin/busybox --install -s /system/xbin/
+}
+
+# main
+echo "Remounting rootfs as rw"
+toolbox mount -o remount,rw / /
+echo "Remounting system as rw"
+toolbox mount -o remount,rw /system /system
+
+CREATE_BUSYBOX_SYMLINK
+INSTALL_BUSYBOX
+
+echo "Remounting rootfs as ro"
+toolbox mount -o remount,ro / /
+echo "Remounting system as ro"
+toolbox mount -o remount,ro /system /system
+
+echo "Done"
+exit
+

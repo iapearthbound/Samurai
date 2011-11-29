@@ -72,7 +72,7 @@
 
 #define TXQLEN		4096	/* bulk tx queue lengths */
 #define TXHI		(TXQLEN - 512) /* turn on flow control above TXHI */
-#define TXLOW		(TXHI / 512) /* turn off flow control above TXLOW */
+#define TXLOW		(TXHI - 512) /* turn off flow control below TXLOW */
 #define PRIOMASK	7
 
 #define TXRETRIES	2	/* # of retries for tx frames */
@@ -1112,7 +1112,7 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt)
 		}
 		dhd_os_sdunlock_txq(bus->dhd);
 
-		if ((pktq_len(&bus->txq) >= FCHI) && dhd_doflow)
+    		if (pktq_len(&bus->txq) >= TXHI)
 			dhd_txflowcontrol(bus->dhd, 0, ON);
 
 #ifdef DHD_DEBUG
@@ -1210,9 +1210,9 @@ dhdsdio_sendfromq(dhd_bus_t *bus, uint maxframes)
 	}
 
 	/* Deflow-control stack if needed */
-		if (dhd_doflow && dhd->up && (dhd->busstate == DHD_BUS_DATA) &&
-		    dhd->tx0ff && (pktq_len(&bus->txq) < TXLOW))
-		dhd_txflowcontrol(dhd, 0, OFF);
+  		if (dhd->up && (dhd->busstate == DHD_BUS_DATA) &&
+     			dhd->txoff && (pktq_len(&bus->txq) < TXLOW))
+			dhd_txflowcontrol(dhd, 0, OFF);
 
 	return cnt;
 }

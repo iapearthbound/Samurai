@@ -25,9 +25,7 @@
 
 #define __rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))
 
-+
-
-+/* __jhash_mix - mix 3 32-bit values reversibly. */
+/* __jhash_mix - mix 3 32-bit values reversibly. */
 
 #define __jhash_mix(a,b,c) \
 { \

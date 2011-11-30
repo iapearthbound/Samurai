@@ -1212,7 +1212,7 @@ dhdsdio_sendfromq(dhd_bus_t *bus, uint maxframes)
 	/* Deflow-control stack if needed */
   		if (dhd->up && (dhd->busstate == DHD_BUS_DATA) &&
      			dhd->txoff && (pktq_len(&bus->txq) < TXLOW))
-			dhd_txflowcontrol(dhd, 0, OFF);
+		dhd_txflowcontrol(dhd, 0, OFF);
 
 	return cnt;
 }

@@ -33,8 +33,7 @@
 #include <mach/cpu-freq-v210.h>
 #endif
 
-#define dprintk(msg...) cpufreq_debug_printk(CPUFREQ_DEBUG_CORE, \
-						"cpufreq-core", msg)
+#define dprintk(msg...) // cpufreq_debug_printk(CPUFREQ_DEBUG_CORE, "cpufreq-core", msg)
 
 /* UV */
 extern unsigned int freq_uv_table[NUM_FREQ][3];

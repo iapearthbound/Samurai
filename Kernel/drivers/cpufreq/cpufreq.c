@@ -39,7 +39,7 @@
 extern unsigned int freq_uv_table[NUM_FREQ][3];
 int exp_UV_mV[NUM_FREQ] =     {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 };
 int enabled_freqs[NUM_FREQ] = {  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1,  1,  1 };
-/*  clock freqs               {  1.5GHz,  1.49GHz,  1.44GHz,  1.4GHz,  1.33GHz,  1.3GHz,  1.2GHz,  1.1GHz,  1.0GHz,  900MHz,  800MHz,  600MHz,  400MHz, 200MHz, 100MHz } */
+/*  clock freqs               {  1.5GHz,  1.49GHz,  1.44GHz,  1.4GHz,  1.34GHz,  1.3GHz,  1.2GHz,  1.1GHz,  1.0GHz,  900MHz,  800MHz,  600MHz,  400MHz, 200MHz, 100MHz } */
 
 /**
  * The "cpufreq driver" - the arch- or hardware-dependent low
@@ -1967,7 +1967,8 @@ static int __cpuinit cpufreq_cpu_callback(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __refdata cpufreq_cpu_notifier = {
+static struct notifier_block __refdata cpufreq_cpu_notifier =
+{
     .notifier_call = cpufreq_cpu_callback,
 };
 

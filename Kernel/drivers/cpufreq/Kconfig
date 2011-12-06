@@ -272,10 +272,6 @@ config CPU_FREQ_GOV_INTELLIDEMAND
         help
           'intellidemand' - an intelligent ondemand governor
 
-config CPU_FREQ_GOV_LAZY
-        tristate "'lazy' cpufreq governor"
-        depends on CPU_FREQ
-
 config CPU_FREQ_GOV_LAGFREE
         tristate "'lagfree' cpufreq governor"
         depends on CPU_FREQ

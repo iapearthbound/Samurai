@@ -73,8 +73,8 @@ unsigned int freq_uv_table[NUM_FREQ][3] = {
 	//frequency, stock voltage, current voltage
 	{1500000, 1500, 1500},	
 	{1400000, 1425, 1425},
-	{1300000, 1375, 1375},
-	{1200000, 1325, 1325},
+	{1300000, 1350, 1375},
+	{1200000, 1300, 1300},
 	{1000000, 1275, 1275},
 	{900000, 1225, 1225},
 	{800000, 1200, 1200},
@@ -109,11 +109,11 @@ static struct s5pv210_dvs_conf dvs_conf[NUM_FREQ] = {
 		.int_volt   = 1250000,
 	},
 	[L2] = { //1.3GHz
-		.arm_volt   = 1375000,
+		.arm_volt   = 1350000,
 		.int_volt   = 1200000,
 	},
 	[L3] = { //1.2GHz
-		.arm_volt   = 1325000,
+		.arm_volt   = 1300000,
 		.int_volt   = 1150000,
 	},
 	[L4] = { //1.0GHz
